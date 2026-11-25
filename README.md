@@ -55,9 +55,19 @@ Buka http://127.0.0.1:8000/ (landing page) dan http://127.0.0.1:8000/dashboard/.
 
 ## Perbaikan pada MoTxT
 
-Kode asli hasil generate MoTxT ada di commit pertama MoTxT. Perbaikannya ada di commit terpisah, jadi before/after bisa dilihat di riwayat commit.
+Riwayat commit MoTxT dibagi tiga tahap, jadi before/after tiap perbaikan bisa dilihat di diff commit:
+
+1. `Add MoTxT generated Django project (original, unmodified)`: kode asli hasil generate.
+2. `Fix MoTxT generated code so the project runs`: perbaikan error 1–4 di bawah.
+3. `Improve MoTxT list display`: perbaikan tampilan (poin 5).
+
+Perbaikan error (tanpa ini project tidak bisa jalan):
 
 1. **`NameError: name 'Outlet' is not defined`**: class direferensikan sebelum didefinisikan. Referensi relasi diubah menjadi string (`'Outlet'`).
 2. **`fields.E302/E303`**: relasi 1..1 Pesanan–Pembayaran dibuat di dua sisi. Field `Pesanan.pembayaran` dihapus.
 3. **`fields.E331/E340`**: association class `KetersediaanMenu` dibuat dua kali dan M2M dibuat di dua sisi. Digabung menjadi satu tabel penghubung, M2M hanya di `Outlet` (`blank=True`).
 4. **`TemplateDoesNotExist`**: nama template di `views.py` tidak cocok dengan nama file. Nama disesuaikan dan `edit_koki.html` ditambahkan.
+
+Perbaikan tampilan (project sudah jalan, tetapi tabel list sulit dibaca):
+
+5. **Kolom `N/A` dan teks `Outlet object (1)`**: view mengambil kolom dari `_meta.get_fields()` yang ikut memuat relasi balik (`koki`, `pesanan`, dll.), sehingga tampil `N/A`. Model juga tidak punya `__str__`. Ditambahkan helper `display_fields()` di `views.py` yang hanya mengambil field asli model, dan `__str__` di setiap model.
