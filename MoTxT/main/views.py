@@ -371,7 +371,7 @@ def create_item_pesanan(request):
             return redirect('main:get_item_pesanan')
     else:
         form = ItemPesananForm()
-    return render(request, 'create_item_pesanan.html', {'form': form})
+    return render(request, 'create_itempesanan.html', {'form': form})
 
 def edit_item_pesanan(request, id):
     item_pesanan_obj = ItemPesanan.objects.get(pk=id)
@@ -380,7 +380,7 @@ def edit_item_pesanan(request, id):
         form.save()
         return redirect('main:get_item_pesanan')
 
-    return render(request, 'edit_item_pesanan.html', {'form': form})
+    return render(request, 'edit_itempesanan.html', {'form': form})
 
 def get_item_pesanan(request):
     item_pesanans = ItemPesanan.objects.all()
@@ -560,7 +560,7 @@ def create_alamat_pengiriman(request):
             return redirect('main:get_alamat_pengiriman')
     else:
         form = AlamatPengirimanForm()
-    return render(request, 'create_alamat_pengiriman.html', {'form': form})
+    return render(request, 'create_alamatpengiriman.html', {'form': form})
 
 def edit_alamat_pengiriman(request, id):
     alamat_pengiriman_obj = AlamatPengiriman.objects.get(pk=id)
@@ -569,7 +569,7 @@ def edit_alamat_pengiriman(request, id):
         form.save()
         return redirect('main:get_alamat_pengiriman')
 
-    return render(request, 'edit_alamat_pengiriman.html', {'form': form})
+    return render(request, 'edit_alamatpengiriman.html', {'form': form})
 
 def get_alamat_pengiriman(request):
     alamat_pengirimans = AlamatPengiriman.objects.all()
@@ -686,7 +686,7 @@ def create_ketersediaan_menu(request):
             return redirect('main:get_ketersediaan_menu')
     else:
         form = KetersediaanMenuForm()
-    return render(request, 'create_ketersediaan_menu.html', {'form': form})
+    return render(request, 'create_ketersediaanmenu.html', {'form': form})
 
 def edit_ketersediaan_menu(request, id):
     ketersediaan_menu_obj = KetersediaanMenu.objects.get(pk=id)
@@ -695,7 +695,7 @@ def edit_ketersediaan_menu(request, id):
         form.save()
         return redirect('main:get_ketersediaan_menu')
 
-    return render(request, 'edit_ketersediaan_menu.html', {'form': form})
+    return render(request, 'edit_ketersediaanmenu.html', {'form': form})
 
 def get_ketersediaan_menu(request):
     ketersediaan_menus = KetersediaanMenu.objects.all()
