@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Database lokal (dibuat ulang dengan `python manage.py migrate`)
+db.sqlite3
+
+# Backup file
+*.orig
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
