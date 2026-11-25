@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load filter_tag %}
+{% block meta %}
+<title>Pelanggan List</title>
+{% endblock meta %}
+{% block content %}
+  <section class="relative mx-4 overflow-hidden md:mx-8 lg:mx-12">
+    <div class="pointer-events-none absolute -left-20 top-2 hidden h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl md:block"></div>
+    <div class="pointer-events-none absolute -right-10 top-20 hidden h-80 w-80 rounded-full bg-fuchsia-500/20 blur-3xl md:block"></div>
+
+    <div class="relative grid gap-6 lg:grid-cols-[260px_1fr]">
+      <div class="hidden lg:block" data-entity-sidebar></div>
+
+      <div class="space-y-6">
+        <header class="rounded-3xl border border-white/20 bg-white/60 px-4 py-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50 sm:px-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Dashboard</p>
+              <h1 class="mt-1 text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-2xl lg:text-3xl">Pelanggan List</h1>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Manage existing pelanggan records.</p>
+            </div>
+            <button type="button" onclick="openPelangganModal()" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 px-4 py-2 text-xs font-semibold leading-none whitespace-nowrap text-white shadow-lg shadow-violet-600/30 transition-transform duration-300 hover:-translate-y-0.5 sm:px-5 sm:py-2.5 sm:text-sm">
+              <svg
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1"
+              class="h-5 w-5"
+            >
+              <path
+                d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
+              />
+              <span>Create New</span>
+            </button>
+          </div>
+        </header>
+
+        <article class="overflow-hidden rounded-3xl border border-white/20 bg-white/60 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50">
+          <div class="overflow-x-auto overflow-y-auto min-h-[14rem] max-h-[70vh] sm:min-h-[20rem] lg:min-h-[26rem]">
+            <table id="pelangganTable" class="min-w-max w-full divide-y divide-slate-200/70 dark:divide-slate-700/80" aria-label="Pelanggan list table">
+              <thead class="bg-slate-100/80 dark:bg-slate-800/70">
+                <tr>
+                  {% for field in fields %}
+                    <th scope="col" data-sortable="true" class="cursor-pointer select-none whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.11em] text-slate-600 dark:text-slate-300 sm:px-6">{{ field }}</th>
+                  {% endfor %}
+                  <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.11em] text-slate-600 dark:text-slate-300 sm:px-6">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200/70 bg-white/30 dark:divide-slate-700/80 dark:bg-slate-900/10">
+                {% for pelanggan, pelanggan_dict in pelanggan_data %}
+                <tr class="transition-colors hover:bg-indigo-50/70 dark:hover:bg-slate-800/70">
+                  {% for field in fields %}
+                    <td class="whitespace-nowrap px-4 py-3 text-sm text-slate-700 dark:text-slate-200 sm:px-6">{{ pelanggan_dict|get_item:field }}</td>
+                  {% endfor %}
+                  <td class="whitespace-nowrap px-4 py-3 text-sm sm:px-6">
+                    <div class="flex gap-2">
+                      <button type="button" class="inline-flex items-center rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 font-semibold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 dark:hover:bg-indigo-900/60"
+                        data-edit-id="{{ pelanggan.id }}"
+                        data-edit-nomor_telepon="{{ pelanggan.nomorTelepon }}"
+
+                        data-edit-alamatpengiriman="{% if pelanggan.alamatpengiriman %}{{ pelanggan.alamatpengiriman.id }}{% endif %}"
+
+                        data-edit-pesanan="{% if pelanggan.pesanan %}{{ pelanggan.pesanan.id }}{% endif %}"
+                        onclick="openPelangganModal(this)">Edit</button>
+                      <form action="{% url 'main:delete_pelanggan' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="object_id" value="{{ pelanggan.id }}">
+                        <button type="submit" class="inline-flex items-center rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-300 dark:hover:bg-rose-900/50">Delete</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="{{ fields|length|add:1 }}" class="px-4 py-8 text-center text-sm text-slate-600 dark:text-slate-300 sm:px-6">No pelanggans yet. Use the create button to add your first record.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <button type="button" onclick="openPelangganModal()" class="fixed bottom-8 right-8 z-30 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-3xl font-bold text-white shadow-2xl shadow-indigo-500/30 transition-transform duration-300 hover:scale-105">
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </button>
+  </section>
+
+  <section id="pelangganModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-2xl overflow-y-auto max-h-[90vh] rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+      <div class="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Record Form</p>
+          <h2 id="pelangganModalTitle" class="text-2xl font-black text-slate-900 dark:text-white">Create New Pelanggan</h2>
+        </div>
+        <button type="button" onclick="closePelangganModal()" class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-1 text-sm font-semibold text-rose-700 hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-300 dark:hover:bg-rose-900/50">&#10006;</button>
+      </div>
+
+      <form id="pelangganForm" method="POST" action="{% url 'main:create_pelanggan' %}" class="space-y-4">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <div class="pt-2">
+          <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition-transform duration-300 hover:-translate-y-0.5">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const editPelangganUrlTemplate = "{% url 'main:edit_pelanggan' 0 %}";
+
+    function openPelangganModal(button) {
+      const modal = document.getElementById('pelangganModal');
+      const form = document.getElementById('pelangganForm');
+      const title = document.getElementById('pelangganModalTitle');
+
+      form.reset();
+      form.action = "{% url 'main:create_pelanggan' %}";
+      title.textContent = 'Create New Pelanggan';
+
+      if (button && button.dataset && button.dataset.editId) {
+        const editId = button.dataset.editId;
+        form.action = editPelangganUrlTemplate.replace('/0/', `/${editId}/`);
+        title.textContent = 'Edit Pelanggan';
+
+        const nomor_teleponInput = form.querySelector('[name="nomorTelepon"]');
+        if (nomor_teleponInput) {
+          nomor_teleponInput.value = button.getAttribute('data-edit-nomor_telepon') || '';
+        }
+
+        const alamatpengirimanInput = form.querySelector('[name="alamatpengiriman"]');
+        if (alamatpengirimanInput) {
+          alamatpengirimanInput.value = button.getAttribute('data-edit-alamatpengiriman') || '';
+        }
+
+        const pesananInput = form.querySelector('[name="pesanan"]');
+        if (pesananInput) {
+          pesananInput.value = button.getAttribute('data-edit-pesanan') || '';
+        }
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePelangganModal() {
+      const modal = document.getElementById('pelangganModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    document.getElementById('pelangganModal').addEventListener('click', function(event) {
+      if (event.target.id === 'pelangganModal') {
+        closePelangganModal();
+      }
+    });
+
+    (function enablePelangganTableSorting() {
+      const table = document.getElementById('pelangganTable');
+      if (!table) return;
+
+      const tbody = table.querySelector('tbody');
+      const headers = Array.from(table.querySelectorAll('thead th[data-sortable="true"]'));
+      const sortState = { index: -1, direction: 'asc' };
+
+      const parseValue = (value) => {
+        const cleaned = value.trim();
+        if (!cleaned) return { type: 'text', value: '' };
+
+        const numeric = Number(cleaned.replace(/,/g, ''));
+        if (!Number.isNaN(numeric) && cleaned.match(/^[-+]?\d[\d,.]*$/)) {
+          return { type: 'number', value: numeric };
+        }
+
+        const asDate = Date.parse(cleaned);
+        if (!Number.isNaN(asDate)) {
+          return { type: 'date', value: asDate };
+        }
+
+        return { type: 'text', value: cleaned.toLowerCase() };
+      };
+
+      const compareValues = (left, right) => {
+        if (left.type === right.type) {
+          if (left.value < right.value) return -1;
+          if (left.value > right.value) return 1;
+          return 0;
+        }
+
+        const order = { number: 0, date: 1, text: 2 };
+        return order[left.type] - order[right.type];
+      };
+
+      const updateHeaderIndicators = () => {
+        headers.forEach((header, idx) => {
+          const label = header.textContent.replace(/[↑↓]\s*$/, '').trim();
+          if (idx !== sortState.index) {
+            header.textContent = label;
+            return;
+          }
+          header.textContent = `${label} ${sortState.direction === 'asc' ? '↑' : '↓'}`;
+        });
+      };
+
+      headers.forEach((header, columnIndex) => {
+        header.addEventListener('click', () => {
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+          if (rows.length <= 1) return;
+
+          const emptyRow = rows[0].querySelector('td[colspan]');
+          if (emptyRow) return;
+
+          sortState.direction = sortState.index === columnIndex && sortState.direction === 'asc' ? 'desc' : 'asc';
+          sortState.index = columnIndex;
+
+          const sorted = rows
+            .map((row, idx) => {
+              const cell = row.children[columnIndex];
+              const value = parseValue(cell ? cell.textContent : '');
+              return { row, idx, value };
+            })
+            .sort((a, b) => {
+              const compared = compareValues(a.value, b.value);
+              if (compared === 0) return a.idx - b.idx;
+              return sortState.direction === 'asc' ? compared : -compared;
+            });
+
+          sorted.forEach(({ row }) => tbody.appendChild(row));
+          updateHeaderIndicators();
+        });
+      });
+    })();
+  </script>
+{% endblock content %}
+

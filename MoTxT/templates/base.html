@@ -1,0 +1,264 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% block meta %} {% endblock meta %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                50: '#eff6ff',
+                100: '#dbeafe',
+                500: '#3b82f6',
+                600: '#2563eb',
+                700: '#1d4ed8',
+              },
+              secondary: '#475569',
+            }
+          }
+        }
+      }
+    </script>
+
+    <script>
+      (function () {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="flex min-h-screen flex-col overflow-x-hidden bg-slate-300 font-sans transition-colors duration-200 dark:bg-slate-900">
+
+    <nav class="mb-4 rounded-b-2xl border border-white/30 bg-white/35 shadow-xl shadow-slate-900/10 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/45">
+      <div class="max-w-dvw mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex-shrink-0 flex items-center gap-3">
+            <button
+              id="drawerToggle"
+              onclick="toggleDrawer()"
+              class="lg:hidden rounded-xl border border-white/30 bg-white/40 p-2 text-secondary transition-colors hover:bg-white/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-white/10 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-slate-700/70"
+              aria-label="Toggle navigation drawer"
+            >
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            {% block back_to_home %}
+              <a href="{% url 'main:landing_page' %}" class="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/40 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white/60 dark:border-white/10 dark:bg-slate-800/50 dark:text-slate-200 dark:hover:bg-slate-700/70">
+                <span aria-hidden="true">←</span>
+                <span>Back to Home</span>
+              </a>
+            {% endblock back_to_home %}
+          </div>
+          <div class="flex items-center gap-4">
+            <button
+              onclick="toggleTheme()"
+              class="rounded-xl border border-white/30 bg-white/40 p-2 text-secondary transition-colors hover:bg-white/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-white/10 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-slate-700/70"
+              aria-label="Toggle dark mode"
+            >
+              <svg class="h-5 w-5 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1m15.07-6.07-.71.71M5.64 18.36l-.71.71m12.73 0-.71-.71M5.64 5.64l-.71-.71M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+              </svg>
+              <svg class="h-5 w-5 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div id="drawerOverlay" class="pointer-events-none fixed inset-0 z-40 bg-black/0 transition-colors duration-300 lg:hidden"></div>
+    <div id="drawerPanel" class="fixed left-0 top-0 z-50 h-screen w-80 -translate-x-full transform overflow-y-auto bg-white/90 shadow-2xl transition-transform duration-300 dark:bg-slate-900/95 lg:hidden">
+      <div class="space-y-4 p-4">
+        <button
+          onclick="toggleDrawer()"
+          class="ml-auto block rounded-xl border border-white/30 bg-white/40 p-2 text-secondary transition-colors hover:bg-white/60 dark:border-white/10 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-slate-700/70"
+          aria-label="Close navigation drawer"
+        >
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div id="drawerContent"></div>
+      </div>
+    </div>
+
+    <main class="flex-1">{% block content %} {% endblock content %}</main>
+
+    <footer class="mx-4 mt-10 pb-6 text-center md:mx-8 lg:mx-12">
+      <div class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/50 px-4 py-2 text-sm font-medium text-slate-700 shadow-lg shadow-indigo-500/10 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-800/60 dark:text-slate-200">
+        <span class="h-2 w-2 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"></span>
+        powered by <span class="bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text font-bold text-transparent">motxt</span>
+      </div>
+    </footer>
+
+    <template id="entitySidebarTemplate">
+      <aside class="rounded-3xl border border-white/20 bg-white/60 p-4 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50 lg:p-5">
+        <a href="{% url 'main:landing_page' %}" class="mb-0 block text-lg font-black tracking-tight text-slate-900 dark:text-white lg:mb-6 lg:text-xl">Class_Diagram</a>
+        <p class="mb-3 mt-3 hidden text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 lg:block">Entities</p>
+        <nav class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 text-sm lg:mx-0 lg:block lg:space-y-2 lg:overflow-visible lg:px-0 lg:pb-0">
+          <a data-entity-link href="{% url 'main:get_pengguna' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Pengguna</a>
+          <a data-entity-link href="{% url 'main:get_koki' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Koki</a>
+          <a data-entity-link href="{% url 'main:get_outlet' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Outlet</a>
+          <a data-entity-link href="{% url 'main:get_menu' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Menu</a>
+          <a data-entity-link href="{% url 'main:get_item_pesanan' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">ItemPesanan</a>
+          <a data-entity-link href="{% url 'main:get_pesanan' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Pesanan</a>
+          <a data-entity-link href="{% url 'main:get_pelanggan' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Pelanggan</a>
+          <a data-entity-link href="{% url 'main:get_alamat_pengiriman' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">AlamatPengiriman</a>
+          <a data-entity-link href="{% url 'main:get_pembayaran' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">Pembayaran</a>
+          <a data-entity-link href="{% url 'main:get_ketersediaan_menu' %}" class="inline-flex whitespace-nowrap rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60 lg:flex">KetersediaanMenu</a>
+        </nav>
+      </aside>
+    </template>
+
+    <template id="entityDrawerTemplate">
+      <div class="space-y-4">
+        <a href="{% url 'main:landing_page' %}" class="block text-lg font-black tracking-tight text-slate-900 dark:text-white">Class_Diagram</a>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Entities</p>
+        <nav class="space-y-2">
+          <a data-entity-link href="{% url 'main:get_pengguna' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Pengguna</a>
+          <a data-entity-link href="{% url 'main:get_koki' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Koki</a>
+          <a data-entity-link href="{% url 'main:get_outlet' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Outlet</a>
+          <a data-entity-link href="{% url 'main:get_menu' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Menu</a>
+          <a data-entity-link href="{% url 'main:get_item_pesanan' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">ItemPesanan</a>
+          <a data-entity-link href="{% url 'main:get_pesanan' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Pesanan</a>
+          <a data-entity-link href="{% url 'main:get_pelanggan' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Pelanggan</a>
+          <a data-entity-link href="{% url 'main:get_alamat_pengiriman' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">AlamatPengiriman</a>
+          <a data-entity-link href="{% url 'main:get_pembayaran' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">Pembayaran</a>
+          <a data-entity-link href="{% url 'main:get_ketersediaan_menu' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 transition hover:bg-white/70 dark:text-slate-200 dark:hover:bg-slate-800/60">KetersediaanMenu</a>
+        </nav>
+      </div>
+    </template>
+
+    <script>
+      let drawerOpen = false;
+
+      function toggleTheme() {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      function toggleDrawer() {
+        const drawerPanel = document.getElementById('drawerPanel');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+
+        drawerOpen = !drawerOpen;
+
+        if (drawerOpen) {
+          drawerPanel.classList.remove('-translate-x-full');
+          drawerOverlay.classList.remove('pointer-events-none');
+          drawerOverlay.classList.add('bg-black/50', 'pointer-events-auto');
+        } else {
+          drawerPanel.classList.add('-translate-x-full');
+          drawerOverlay.classList.add('pointer-events-none');
+          drawerOverlay.classList.remove('bg-black/50', 'pointer-events-auto');
+        }
+      }
+
+      function closeDrawer() {
+        if (drawerOpen) {
+          toggleDrawer();
+        }
+      }
+
+      function applyEntityLinkStyles() {
+        const normalizePath = (path) => {
+          const normalized = path.replace(/\/+$/, '');
+          return normalized || '/';
+        };
+
+        const currentPath = normalizePath(window.location.pathname);
+        const links = document.querySelectorAll('[data-entity-link]');
+
+        const inactiveClasses = ['font-medium', 'text-slate-700', 'transition', 'hover:bg-white/70', 'dark:text-slate-200', 'dark:hover:bg-slate-800/60'];
+        const activeClasses = ['bg-gradient-to-r', 'from-indigo-600', 'to-violet-600', 'font-semibold', 'text-white', 'shadow-lg', 'shadow-indigo-500/25'];
+
+        links.forEach((link) => {
+          const linkPath = normalizePath(new URL(link.href, window.location.origin).pathname);
+          if (linkPath === currentPath) {
+            link.classList.remove(...inactiveClasses);
+            link.classList.add(...activeClasses);
+          }
+        });
+      }
+
+      function mountEntitySidebar() {
+        const isSmallScreen = window.innerWidth < 1024;
+
+        if (isSmallScreen) {
+          const drawerContent = document.querySelector('#drawerContent');
+          const drawerTemplate = document.getElementById('entityDrawerTemplate');
+          if (drawerContent && drawerTemplate) {
+            drawerContent.innerHTML = drawerTemplate.innerHTML;
+          }
+        } else {
+          const mount = document.querySelector('[data-entity-sidebar]');
+          const sidebarTemplate = document.getElementById('entitySidebarTemplate');
+          if (mount && sidebarTemplate) {
+            mount.innerHTML = sidebarTemplate.innerHTML;
+          }
+        }
+
+        document.querySelectorAll('[data-entity-link]').forEach((link) => {
+          link.addEventListener('click', closeDrawer);
+        });
+
+        applyEntityLinkStyles();
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        mountEntitySidebar();
+
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        drawerOverlay.addEventListener('click', closeDrawer);
+
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            const isSmallScreen = window.innerWidth < 1024;
+            const mount = document.querySelector('[data-entity-sidebar]');
+            const drawerContent = document.querySelector('#drawerContent');
+
+            if (isSmallScreen && drawerContent && drawerContent.innerHTML === '') {
+              closeDrawer();
+              mountEntitySidebar();
+            } else if (!isSmallScreen && mount && mount.innerHTML === '') {
+              closeDrawer();
+              mountEntitySidebar();
+            }
+          }, 250);
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        applyEntityLinkStyles();
+      });
+    </script>
+  </body>
+</html>
