@@ -6,6 +6,24 @@ from django.apps import apps
 from datetime import date
 
 
+def display_fields(model):
+    """Field asli model untuk ditampilkan di tabel.
+
+    Melewati relasi balik (reverse relation) dan parent link inheritance
+    (mis. pengguna_ptr), yang sebelumnya tampil sebagai "N/A".
+    """
+    fields = []
+    for f in model._meta.get_fields():
+        if not (f.concrete or f.many_to_many):
+            continue
+        if f.many_to_many and f.auto_created:
+            continue
+        if getattr(f.remote_field, 'parent_link', False):
+            continue
+        fields.append(f.name)
+    return fields
+
+
 def landing_page(request):
 
     model_info = {}
@@ -30,7 +48,7 @@ def dashboard(request):
             'count': Pengguna.objects.count(),
             'list_url': 'main:get_pengguna',
             'create_url': 'main:create_pengguna',
-            'fields': [field.name for field in Pengguna._meta.get_fields()],
+            'fields': display_fields(Pengguna),
         }
 ,
         {
@@ -38,7 +56,7 @@ def dashboard(request):
             'count': Koki.objects.count(),
             'list_url': 'main:get_koki',
             'create_url': 'main:create_koki',
-            'fields': [field.name for field in Koki._meta.get_fields()],
+            'fields': display_fields(Koki),
         }
 ,
         {
@@ -46,7 +64,7 @@ def dashboard(request):
             'count': Outlet.objects.count(),
             'list_url': 'main:get_outlet',
             'create_url': 'main:create_outlet',
-            'fields': [field.name for field in Outlet._meta.get_fields()],
+            'fields': display_fields(Outlet),
         }
 ,
         {
@@ -54,7 +72,7 @@ def dashboard(request):
             'count': Menu.objects.count(),
             'list_url': 'main:get_menu',
             'create_url': 'main:create_menu',
-            'fields': [field.name for field in Menu._meta.get_fields()],
+            'fields': display_fields(Menu),
         }
 ,
         {
@@ -62,7 +80,7 @@ def dashboard(request):
             'count': ItemPesanan.objects.count(),
             'list_url': 'main:get_item_pesanan',
             'create_url': 'main:create_item_pesanan',
-            'fields': [field.name for field in ItemPesanan._meta.get_fields()],
+            'fields': display_fields(ItemPesanan),
         }
 ,
         {
@@ -70,7 +88,7 @@ def dashboard(request):
             'count': Pesanan.objects.count(),
             'list_url': 'main:get_pesanan',
             'create_url': 'main:create_pesanan',
-            'fields': [field.name for field in Pesanan._meta.get_fields()],
+            'fields': display_fields(Pesanan),
         }
 ,
         {
@@ -78,7 +96,7 @@ def dashboard(request):
             'count': Pelanggan.objects.count(),
             'list_url': 'main:get_pelanggan',
             'create_url': 'main:create_pelanggan',
-            'fields': [field.name for field in Pelanggan._meta.get_fields()],
+            'fields': display_fields(Pelanggan),
         }
 ,
         {
@@ -86,7 +104,7 @@ def dashboard(request):
             'count': AlamatPengiriman.objects.count(),
             'list_url': 'main:get_alamat_pengiriman',
             'create_url': 'main:create_alamat_pengiriman',
-            'fields': [field.name for field in AlamatPengiriman._meta.get_fields()],
+            'fields': display_fields(AlamatPengiriman),
         }
 ,
         {
@@ -94,7 +112,7 @@ def dashboard(request):
             'count': Pembayaran.objects.count(),
             'list_url': 'main:get_pembayaran',
             'create_url': 'main:create_pembayaran',
-            'fields': [field.name for field in Pembayaran._meta.get_fields()],
+            'fields': display_fields(Pembayaran),
         }
 ,
         {
@@ -102,7 +120,7 @@ def dashboard(request):
             'count': KetersediaanMenu.objects.count(),
             'list_url': 'main:get_ketersediaan_menu',
             'create_url': 'main:create_ketersediaan_menu',
-            'fields': [field.name for field in KetersediaanMenu._meta.get_fields()],
+            'fields': display_fields(KetersediaanMenu),
         }
     ]
 
@@ -133,7 +151,7 @@ def edit_pengguna(request, id):
 def get_pengguna(request):
     penggunas = Pengguna.objects.all()
     
-    all_fields = [field.name for field in Pengguna._meta.get_fields()]
+    all_fields = display_fields(Pengguna)
     pengguna_data = []
     form = PenggunaForm()
     
@@ -196,7 +214,7 @@ def edit_koki(request, id):
 def get_koki(request):
     kokis = Koki.objects.all()
     
-    all_fields = [field.name for field in Koki._meta.get_fields()]
+    all_fields = display_fields(Koki)
     koki_data = []
     form = KokiForm()
     
@@ -259,7 +277,7 @@ def edit_outlet(request, id):
 def get_outlet(request):
     outlets = Outlet.objects.all()
     
-    all_fields = [field.name for field in Outlet._meta.get_fields()]
+    all_fields = display_fields(Outlet)
     outlet_data = []
     form = OutletForm()
     
@@ -322,7 +340,7 @@ def edit_menu(request, id):
 def get_menu(request):
     menus = Menu.objects.all()
     
-    all_fields = [field.name for field in Menu._meta.get_fields()]
+    all_fields = display_fields(Menu)
     menu_data = []
     form = MenuForm()
     
@@ -385,7 +403,7 @@ def edit_item_pesanan(request, id):
 def get_item_pesanan(request):
     item_pesanans = ItemPesanan.objects.all()
     
-    all_fields = [field.name for field in ItemPesanan._meta.get_fields()]
+    all_fields = display_fields(ItemPesanan)
     item_pesanan_data = []
     form = ItemPesananForm()
     
@@ -448,7 +466,7 @@ def edit_pesanan(request, id):
 def get_pesanan(request):
     pesanans = Pesanan.objects.all()
     
-    all_fields = [field.name for field in Pesanan._meta.get_fields()]
+    all_fields = display_fields(Pesanan)
     pesanan_data = []
     form = PesananForm()
     
@@ -511,7 +529,7 @@ def edit_pelanggan(request, id):
 def get_pelanggan(request):
     pelanggans = Pelanggan.objects.all()
     
-    all_fields = [field.name for field in Pelanggan._meta.get_fields()]
+    all_fields = display_fields(Pelanggan)
     pelanggan_data = []
     form = PelangganForm()
     
@@ -574,7 +592,7 @@ def edit_alamat_pengiriman(request, id):
 def get_alamat_pengiriman(request):
     alamat_pengirimans = AlamatPengiriman.objects.all()
     
-    all_fields = [field.name for field in AlamatPengiriman._meta.get_fields()]
+    all_fields = display_fields(AlamatPengiriman)
     alamat_pengiriman_data = []
     form = AlamatPengirimanForm()
     
@@ -637,7 +655,7 @@ def edit_pembayaran(request, id):
 def get_pembayaran(request):
     pembayarans = Pembayaran.objects.all()
     
-    all_fields = [field.name for field in Pembayaran._meta.get_fields()]
+    all_fields = display_fields(Pembayaran)
     pembayaran_data = []
     form = PembayaranForm()
     
@@ -700,7 +718,7 @@ def edit_ketersediaan_menu(request, id):
 def get_ketersediaan_menu(request):
     ketersediaan_menus = KetersediaanMenu.objects.all()
     
-    all_fields = [field.name for field in KetersediaanMenu._meta.get_fields()]
+    all_fields = display_fields(KetersediaanMenu)
     ketersediaan_menu_data = []
     form = KetersediaanMenuForm()
     
